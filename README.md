@@ -4,7 +4,7 @@ A program to generate an image of a mesh of triangles. I currently have this scr
 
 ### The Algorithm
 
-I am generating a random set of points and using [Delaunay triangulation](https://en.wikipedia.org/wiki/Delaunay_triangulation) to generate the mesh. I am using an unoptimized version of Delaunay triangulation which is *O(n<sup>2</sup>)*, while an efficient implementation would be *O(nlog(n))*. This is not an issue, however, as for the purposes of an intermittent background generator, the program is fast enough that it is not an issue.
+I am generating a random set of points and using [Delaunay triangulation](https://en.wikipedia.org/wiki/Delaunay_triangulation) to generate the mesh. I am using an unoptimized version of Delaunay triangulation which is *O(n<sup>2</sup>)*, while an efficient implementation would be *O(nlog(n))*. This is not an issue, however, as it is fast enough to run in well under 1 second on my computer.
 
 ### Screenshots
 
