@@ -116,9 +116,9 @@ bool Delaunay::is_in_circumcircle(point p, triangle t) {
     double distance = square_distance(circumcenter, p);
 
     if (distance < radius)
-	return true;
+	    return true;
     else
-	return false;
+	    return false;
 }
 
 // check if 2 points are the same
@@ -129,15 +129,15 @@ bool Delaunay::are_points_equal(point a, point b) {
 // check if a point is one of the vertices of a triangle
 bool Delaunay::is_triangle_vertex(point p, triangle t) {
     return are_points_equal(p, t.a) ||
-	   are_points_equal(p, t.b) ||
-	   are_points_equal(p, t.c);
+	       are_points_equal(p, t.b) ||
+	       are_points_equal(p, t.c);
 }
 
 // check if 2 triangles are the same
 bool Delaunay::are_triangles_equal(triangle t1, triangle t2) {
     return is_triangle_vertex(t1.a, t2) &&
-	   is_triangle_vertex(t1.b, t2) &&
-	   is_triangle_vertex(t1.c, t2);
+	       is_triangle_vertex(t1.b, t2) &&
+	       is_triangle_vertex(t1.c, t2);
 }
 
 // generates the super triangle and adds it to the list of triangles
@@ -155,18 +155,20 @@ void Delaunay::create_super_triangle() {
 }
 
 // removes all connections to the super triangle after triangulation is complete
+// not necessary and not used
+// removing the super triangle leaves some gaps as not all pixels are guaranteed to be in a triangle without it
 void Delaunay::remove_super_triangle() {
     // loop through all triangles and check if they contain one of the original super triangle points
     vector<triangle>::iterator itr;
     for (itr = triangles.begin(); itr != triangles.end(); itr++) {
-	if (is_triangle_vertex(super_triangle.a, *itr) ||
-	    is_triangle_vertex(super_triangle.b, *itr) ||
-	    is_triangle_vertex(super_triangle.c, *itr))   {
-	
-	    // decrement the iterator and remove the next element
-	    itr--;
-	    triangles.erase(itr + 1);
-	}
+        if (is_triangle_vertex(super_triangle.a, *itr) ||
+            is_triangle_vertex(super_triangle.b, *itr) ||
+            is_triangle_vertex(super_triangle.c, *itr))   {
+        
+            // decrement the iterator and remove the next element
+            itr--;
+            triangles.erase(itr + 1);
+        }
     }
 }
 
@@ -180,94 +182,69 @@ vector<triangle> Delaunay::triangulate() {
     // add one point at a time to the triangulation
     for (point p : points) {
 	
-	// keep a list of all bad triangles (those that are no longer valid with the new point)
-	vector<triangle> bad_triangles;
+        // keep a list of all bad triangles (those that are no longer valid with the new point)
+        vector<triangle> bad_triangles;
 
-	// iterate over all triangles and check if the point is in the circumcircle
-	for (triangle t : triangles) {
-	    // if the point is in the circumcircle, add the triangle to the list of bad triangles
-	    if (is_in_circumcircle(p, t)) {
-		bad_triangles.push_back(t);
-	    }
-	}
+        // iterate over all triangles and check if the point is in the circumcircle
+        for (triangle t : triangles) {
+            // if the point is in the circumcircle, add the triangle to the list of bad triangles
+            if (is_in_circumcircle(p, t)) {
+                bad_triangles.push_back(t);
+            }
+        }
 
-	// create a set of all edges in the bad triangles
-	vector<vector<point>> polygon_edges;
+        // create a set of all edges in the bad triangles
+        vector<vector<point>> polygon_edges;
 
-	// iterate over all the bad triangles to find the polygon hole
-	for (triangle t : bad_triangles) {
-	    // create a list with the triangle's edges to allow them to be iterated over
-	    vector<vector<point>> edges = {{t.a, t.b}, {t.b, t.c}, {t.c, t.a}};
-	    
-	    // iterate over each edge in the triangle and check if it is in any other bad triangles
-	    for (vector<point> edge : edges) {
-		
-		// keep track of how many bad triangles contain the edge
-		// the current triangle should, so the count should be 1 if no other bad triangles do
-		int count = 0;
+        // iterate over all the bad triangles to find the polygon hole
+        for (triangle t : bad_triangles) {
+            // create a list with the triangle's edges to allow them to be iterated over
+            vector<vector<point>> edges = {{t.a, t.b}, {t.b, t.c}, {t.c, t.a}};
+            
+            // iterate over each edge in the triangle and check if it is in any other bad triangles
+            for (vector<point> edge : edges) {
+            
+                // keep track of how many bad triangles contain the edge
+                // the current triangle should, so the count should be 1 if no other bad triangles do
+                int count = 0;
 
-		// iterate over the list of bad triangles and check if they contain the edge
-		for (triangle t2 : bad_triangles) {
-		    // check if both point of the edge are in the triangle, increment count if they are
-		    if (is_triangle_vertex(edge[0], t2) && is_triangle_vertex(edge[1], t2)) {
-			count++;
-		    }
-		}
+                // iterate over the list of bad triangles and check if they contain the edge
+                for (triangle t2 : bad_triangles) {
+                    // check if both point of the edge are in the triangle, increment count if they are
+                    if (is_triangle_vertex(edge[0], t2) && is_triangle_vertex(edge[1], t2)) {
+                        count++;
+                    }
+                }
 
-		// add the edge to the polygon hole if no other bad triangles contain it
-		if (count <= 1) {
-		    polygon_edges.push_back(edge);
-		}
+                // add the edge to the polygon hole if no other bad triangles contain it
+                if (count <= 1) {
+                    polygon_edges.push_back(edge);
+                }
 
-	    }
+            }
 
-	}
+        }
 
-	// remove all bad triangles from the list of triangles
-	for (triangle t : bad_triangles) {
-	    // search the list of bad_triangles until t is found
-	    vector<triangle>::iterator itr;
-	    for (itr = triangles.begin(); itr != triangles.end(); itr++) {
-		if (are_triangles_equal(t, *itr)) {
-		    triangles.erase(itr);
-		    break;
-		}
-	    }
-	}
+        // remove all bad triangles from the list of triangles
+        for (triangle t : bad_triangles) {
+            // search the list of bad_triangles until t is found
+            vector<triangle>::iterator itr;
+            for (itr = triangles.begin(); itr != triangles.end(); itr++) {
+                if (are_triangles_equal(t, *itr)) {
+                    triangles.erase(itr);
+                    break;
+                }
+            }
+        }
 
-	// add new triangles between the point and each edge of the polygon hole
-	for (vector<point> edge : polygon_edges) {
-	    triangle t = {p, edge[0], edge[1]};
-	    triangles.push_back(t);
-	}
+        // add new triangles between the point and each edge of the polygon hole
+        for (vector<point> edge : polygon_edges) {
+            triangle t = {p, edge[0], edge[1]};
+            triangles.push_back(t);
+        }
 
     }
-    
-    // remove all triangles which share a vertex with the original super triangle
-    // remove_super_triangle();
     
     return triangles;
 }
 
-/*
-int main() {
-
-    point a {50, 100};
-    point b {150, 100};
-    point c {50, 200};
-
-    point d {150, 200};
-    triangle t {a, b, c};
-
-    vector<point> points;
-    points.push_back(a);
-    points.push_back(b);
-    points.push_back(c);
-    points.push_back(d);
-
-    Delaunay de(points);
-    de.triangulate();
-
-    return 0;
-}
-*/
