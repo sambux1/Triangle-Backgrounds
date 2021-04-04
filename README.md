@@ -15,3 +15,5 @@ I am generating a random set of points and using [Delaunay triangulation](https:
 ![image](./saved/pastel/2.png)
 ![image](./saved/pastel/4.png)
 ![image](./saved/rainbow/2.png)
+![image](./saved/gray/2.png)
+![image](./saved/yellow/0.png)
